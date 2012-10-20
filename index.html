@@ -1,0 +1,217 @@
+<!DOCTYPE HTML>
+<html manifest="manifest.appcache">
+<head>
+<meta charset="UTF-8">
+<title>Speed Limit </title>
+<meta name="viewport" content="width=device-width,user-scalable=no">
+
+<link rel="stylesheet" href="http://code.jquery.com/mobile/1.0/jquery.mobile-1.0.min.css" />
+
+<script type="text/javascript" src="http://code.jquery.com/jquery-1.6.4.min.js"></script>
+<script type="text/javascript" src="http://code.jquery.com/mobile/1.0/jquery.mobile-1.0.min.js"></script>
+<!-- <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB_xrSXgLyoKc7wou8Ax7wkAFTirMeixVA&sensor=true"></script> -->
+<script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?libraries=places&sensor=true&key=AIzaSyB_xrSXgLyoKc7wou8Ax7wkAFTirMeixVA"></script>
+
+<script type="text/javascript" src="js/ratingstar.js"></script>
+
+<script type="text/javascript" src="js/ispeed.js"></script>
+
+
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<link rel="apple-touch-icon" sizes="80x80" href="images/ispeed-icon.png">
+<link rel="apple-touch-icon" href="images/ispeed-icon.png" sizes="57x57">
+<link rel="apple-touch-icon" href="images/ispeed-icon.png" sizes="114x114">
+<link rel="apple-touch-icon" href="images/ispeed-icon.png" sizes="72x72">
+<link rel="apple-touch-icon-precomposed" sizes="android-only" href="images/ispeed-icon.png">
+</head>
+<body onload=javascript:get_current_location()>
+
+<!-- **** HOME PAGE **** -->
+<div data-role="page" id="home">
+
+  <div data-role=header>
+    <h1>Speed Limit</h1>
+        <div class="ui-grid-a">
+      <!--<div class="ui-block-a"><a href="http://www.twitter.com/fakeaccount" 
+          data-role="button" data-theme="b" target="_blank">Twitter</a></div>
+      <div class="ui-block-b"><a href="http://www.facebook.com/fakeaccount" 
+          data-role="button" data-theme="b" target="_blank">Facebook</a></div> -->
+<div class="ui-block-a"><a href="javascript:get_current_location()" 
+          data-role="button" data-theme="b">Speed Limit</a></div>
+    </div>
+    
+  </div> <!-- end header -->
+
+
+  <div data-role="content" class="content">
+   
+    <span> Latitude : </span> <span id=lat></span> <br />
+    <span> Longitude : </span> <span id=lng></span> <br />
+    <span> Heading : </span> <span id=heading></span> <br />
+ 
+    <span> Street : </span> <span id=street></span> <br />
+
+<div data-role="collapsible-set">
+<div data-role="collapsible" data-collapsed="false" data-theme="b">
+<h3>Restaurant</h3>
+<ul id="restaurant" data-role="listview">
+</ul>
+</div>
+<div data-role="collapsible" data-theme="b">
+<h3>Gas Station</h3>
+<ul id="gas_station" data-role="listview"></ul>
+</div>
+</div> <!-- end set -->
+</div> <!-- end content -->
+
+
+  <div data-role="footer" data-position="fixed" data-id="toolbar">
+    <div data-role="navbar">
+      <ul>
+        <li><a class="ui-btn-active" href="#home" data-icon="home" 
+                data-transition="fade">
+                Home</a></li>
+        <li><a href="#sessions" data-icon="grid" data-transition="fade">Sessions</a>
+        </li>
+        <li><a href="#where" data-icon="info" data-transition="fade">Where</a></li>
+        <li><a href="#about" data-icon="star" data-transition="fade">About</a></li>
+ <li><a href="feedback.html" data-icon="plus" data-rel="dialog">Feedback</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</div> <!-- end page home -->
+
+<!-- **** SESSIONS PAGE **** -->
+<div data-role="page" id="sessions" data-add-back-btn="true">
+  <div data-role="header">
+    <h1>Sessions</h1>
+    <a href='javascript:refresh();' data-icon="refresh" id="refresh" data-theme="c" 
+        class="ui-btn-left" data-iconpos="notext"></a>
+  </div>
+  <div data-role="content" style="width:100%; height:100%; padding:0;">
+  
+<div data-role="collapsible" data-collapsed="false" id=map style="width:100%; height:100%;">
+</div>
+
+
+<div id="map_canvas" style="width:100%; height:100%;"></div>
+  
+    <p id="console"></p>
+    <ul data-role="list-view" data-inset="true" id="slots">
+    </ul>
+  </div>
+  <div data-role="footer" data-position="fixed" data-id="toolbar">
+    <div data-role="navbar">
+      <ul>
+        <li><a href="#home" data-icon="home" data-transition="fade">Home</a></li>
+        <li><a class="ui-btn-active" href="#sessions" data-icon="grid" 
+                data-transition="fade">Sessions</a></li>
+        <li><a href="#where" data-icon="info" data-transition="fade">Where</a></li>
+        <li><a href="#about" data-icon="star" data-transition="fade">About</a></li>
+        <li><a href="feedback.html" data-icon="plus" data-rel="dialog">Feedback</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- **** SESSION'S DETAILS PAGE **** -->
+<div data-role="page" id="details" data-add-back-btn="true">
+  <div data-role="header">
+    <h1>Session detail</h1>
+  </div>
+  <div data-role="content">
+    <div id="map"> </div>
+  </div>
+  <div data-role="footer" data-position="fixed" data-id="toolbar">
+   <div data-role="navbar">
+    <ul>
+     <li><a href="#home" data-icon="home" data-transition="fade">Home</a></li>
+     <li><a href="#sessions" data-icon="grid" data-transition="fade">Sessions</a></li>
+     <li><a href="#where" class="ui-btn-active" data-icon="info" data-transition="fade">Where</a></li>
+     <li><a href="#about" data-icon="star" data-transition="fade">About</a></li>
+     <li><a href="feedback.html" data-icon="plus" data-rel="dialog">Feedback</a></li>
+    </ul>
+   </div>
+  </div>
+</div>
+<!-- **** WHERE PAGE **** -->
+<div data-role="page" id="where">
+  <div data-role="header">
+    <h1>Where</h1>
+  </div>
+  <div data-role="content">
+     Hasta la vista 1234, ACME City
+  </div>
+  <div data-role="footer" data-position="fixed" data-id="toolbar">
+    <div data-role="navbar">
+      <ul>
+        <li><a href="#home" data-icon="home" data-transition="fade">Home</a></li>
+        <li><a href="#sessions" data-icon="grid" data-transition="fade">Sessions</a>
+        </li>
+        <li><a class="ui-btn-active" href="#where" data-icon="info" 
+                data-transition="fade">Where</a></li>
+        <li><a href="#about" data-icon="star" data-transition="fade">About</a></li>
+        <li><a href="feedback.html" data-icon="plus" data-rel="dialog">Feedback</a>
+        </li>
+      </ul>
+    </div>
+ </div>
+</div>
+<!-- **** ABOUT PAGE **** -->
+<div data-role="page" id="about">
+  <div data-role="header">
+    <h1>About</h1>
+  </div>
+  <div data-role="content">
+    <div data-role="collapsible">
+        <h3>Organization</h3>
+        <p>This congress is organized by ACME</p>
+    </div>
+    <div data-role="collapsible">
+        <h3>Dates</h3>
+        <p>November 5th, 2015 9am to 6pm</p>
+    </div>
+    <div data-role="collapsible">
+        <h3>History</h3>
+        <p>First edition of this congress was........</p>
+    </div>
+    <div data-role="collapsible">
+        <h3>Sponsors</h3>
+ <!--<img src="images/sponsors.png" width="300" height="400"> -->
+    </div>
+  </div>
+  <div data-role="footer" data-position="fixed" data-id="toolbar">
+    <div data-role="navbar">
+      <ul>
+        <li><a href="#home" data-icon="home" data-transition="fade">Home</a></li>
+        <li><a href="#sessions" data-icon="grid" data-transition="fade">Sessions</a>
+        </li>
+        <li><a href="#where" data-icon="info" data-transition="fade">Where</a></li>
+        <li><a class="ui-btn-active" href="#about" data-icon="star" 
+                data-transition="fade">About</a></li>
+        <li><a href="feedback.html" data-icon="help" data-transition="fade">Feedback
+        </a></li>
+      </ul>
+    </div>
+  </div>
+</div>
+<!-- **** iOS INSTALLATION DIALOG PAGE **** -->
+<div data-role="page" id="ios">
+ <div data-role="header">
+    <h1>installation</h1>
+  </div>
+  <div data-role="content">
+    <p id="consoleInstall">Complete the installation</p>
+    <div id="install">
+         <p>To finish the installation, you must add this webapp to your Home Screen. 
+             To do that, touch the arrow and select "Add to Home Screen"</p>
+    </div>
+    <a href="javascript:openWithoutInstallation()" class="openWithoutInstall">Open 
+        without installation</a>
+  </div>
+</div>
+</body>
+</html>
