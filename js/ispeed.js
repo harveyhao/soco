@@ -24,7 +24,7 @@ function registerFunction(tag, idx)
             {
                 anchor.click(function(){
                     
-                markPoiOnMap(poi[idx]);
+                mark_poi_map(poi[idx]);
                     
                 changePage();
                });
@@ -52,14 +52,48 @@ function get_current_location()
   		displayPOI(lat, lng);
   
 	});
-	
+
+//the original thought was that I can use the secondary point to figure out the travel direction
+//and then only display the POIs in the travelling direction. The calculation is actually pretty simple
+//if ((poi_lng-sec_lng)*(sec_lng_lng) >=0 and (poi_lat-sec_lat)*(sec_lat-lat) >=0) will tell.
+//for now, does not seem to be value add. Abandon the idea
+/*
+	setTimeout(function() {
+	        navigator.geolocation.getCurrentPosition (function (pos)
+	 		{
+				var sec_lat = pos.coords.latitude;
+  				var sec_lng = pos.coords.longitude;
+  				$("#lats").text (sec_lat);
+  				$("#lngs").text (sec_lng);
+  			});	 
+  		 },10000);
+  */		 
+  		 	
 //	navigator.compass.watchHeading (function (heading)
 	//{
 		//var rotation = Math.round(heading.magneticHeading)+"deg";
 		//$("#heading").text(rotation);
 //	});
+  		 
 }
 
+
+//This function is used to calculate the distance between to geolocations. Not used
+
+function calculateDistance(lat1, lon1, lat2, lon2) {
+  var R = 6371000; // m
+  var dLat = (lat2 - lat1).toRad();
+  var dLon = (lon2 - lon1).toRad(); 
+  var a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+          Math.cos(lat1.toRad()) * Math.cos(lat2.toRad()) * 
+          Math.sin(dLon / 2) * Math.sin(dLon / 2); 
+  var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)); 
+  var d = R * c;
+  return d;
+}
+Number.prototype.toRad = function() {
+  return this * Math.PI / 180;
+}
 
 function create_map(lat, lng) {
 
@@ -76,11 +110,6 @@ function create_map(lat, lng) {
   	
   	
   	var map = new google.maps.Map (content[0], options);
-  	//var map = new google.maps.Map ($("#map"), options);
-  	//use this for no display 
-  	//var map = new google.maps.Map (document.getElementById("map_canvas", options));
-  	//google.maps.event.trigger(map, 'resize');
- 
  
     return map;
 
@@ -89,9 +118,7 @@ function create_map(lat, lng) {
 //This function is to find the address from a given GEOCoding (lat, lng) and locate it in the google map map
 
 function codeLatLng(lat, lng) {
-    //var infowindow = new google.maps.InfoWindow();
-    //var marker;
-
+ 
     var latlng = new google.maps.LatLng(lat, lng);
     var  geocoder = new google.maps.Geocoder();
     var street;
@@ -99,13 +126,6 @@ function codeLatLng(lat, lng) {
     geocoder.geocode({'latLng': latlng}, function(results, status) {
     	if (status == google.maps.GeocoderStatus.OK) {
             if (results[0]) {
-              //marker = new google.maps.Marker({
-                //  								position: latlng,
-                  //								map: map
-             // });
-              
-             // infowindow.setContent(results[1].formatted_address);
-             // infowindow.open(map, marker);
   			  $("#street").text ( results[0].formatted_address);
             } else {
               alert('No results found');
@@ -132,25 +152,26 @@ function displayPOI(lat, lng)
   	service.search(request, callback);
 }  	
 
+
 function callback(results, status) {
   	if (status == google.maps.places.PlacesServiceStatus.OK) {
     
     //assign to global variable poi
 	poi = results;
 	
-    removeMarker();
+    remove_poi();
     
     for (var i = 0; i < results.length; i++) {
-    	createMarker(i);
+    	create_poi(i);
 	}
 	
 	 
-	refreshMarker();
+	refresh_poi();
 	    
   }
 }
 
-function refreshMarker()
+function refresh_poi()
 {
 	//need to refresh list view
 	
@@ -164,7 +185,7 @@ function refreshMarker()
        }
 }
 
-function removeMarker()
+function remove_poi()
 {
 	//need to remove list view
 	
@@ -180,7 +201,7 @@ function removeMarker()
 
 
 
-function createMarker(poi_idx) {
+function create_poi(poi_idx) {
 
  	  var place = poi[poi_idx];
            
@@ -210,19 +231,8 @@ function createMarker(poi_idx) {
 
 
 //THis function will mark a place in the map created
-function markPoiOnMap(place) {
+function mark_poi_on_map(place) {
 
- 	    /*var placeLoc = place.geometry.location;
-        var marker = new google.maps.Marker({
-          map: map,
-          position: place.geometry.location
-        });*/
-
-        //google.maps.event.addListener(marker, 'click', function() {
-          //infowindow.setContent(place.name);
-          //infowindow.open(map, this);
-       // });
-       
         var placeLoc = place.geometry.location;
         var infowindow = new google.maps.InfoWindow();
         
@@ -238,11 +248,6 @@ function markPoiOnMap(place) {
         infowindow.setContent(place.name);
         infowindow.open(map, marker);
 
-    //    google.maps.event.addListener(marker, 'click', function() {
-      //    infowindow.setContent(place.name);
-        //  infowindow.open(map, marker);
-       // });
-      
    
 }
 
@@ -256,6 +261,7 @@ function clearOverlays() {
 }
 
 //This URL utility need to move out to its own area
+// not used any more
 
 $.extend({
   getUrlParms: function(){
