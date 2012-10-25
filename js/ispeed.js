@@ -15,7 +15,7 @@ function onPageShow(e, data)
   
  //here I need to create a binding between click and the displaying the marker on the map
  
-function registerFunction(tag, idx)
+function register_poi_click(tag, idx)
 { 
            
   	$(tag).children().each(function(){
@@ -24,7 +24,7 @@ function registerFunction(tag, idx)
             {
                 anchor.click(function(){
                     
-                mark_poi_map(poi[idx]);
+                mark_poi_on_map(poi[idx]);
                     
                 changePage();
                });
@@ -43,13 +43,13 @@ function get_current_location()
   		
   		//for test purpose, fix the coors
   		
-  		lat = 30.458144;
-  		lng = -97.788723;
+  		//lat = 30.458144;
+  		//lng = -97.788723;
 
   		map=create_map(lat, lng);
   		codeLatLng(lat, lng);
   		
-  		displayPOI(lat, lng);
+  		display_poi(lat, lng);
   
 	});
 
@@ -99,7 +99,7 @@ function create_map(lat, lng) {
 
   	var latlng = new google.maps.LatLng (lat, lng);
   	var options = { 
-    				zoom : 10, 
+    				zoom : 15, 
     				center : latlng, 
     				mapTypeId : google.maps.MapTypeId.ROADMAP 
   				  };
@@ -137,13 +137,13 @@ function codeLatLng(lat, lng) {
 }
 
 //This function is to display the POI information
-function displayPOI(lat, lng)
+function display_poi(lat, lng)
 {
     var latlng = new google.maps.LatLng(lat, lng);
 	
 	  		var request = {
          	location: latlng,
-    		radius: '500',
+    		radius: '1000',
     		//rankBy:	google.maps.places.RankBy.DISTANCE,
     		types: ['store', 'restaurant']
   			};
@@ -221,7 +221,7 @@ function create_poi(poi_idx) {
            			var tag = '#' + displayType[i];
             
       				$(tag).append('<li><a href="#sessions" id=' + poi_idx + ' data-transition="fade"></a>' + place.name + stars[rating] + '<br/><font size=1>'+ place.vicinity + '</font></li>');
-					registerFunction(tag, poi_idx);
+					register_poi_click(tag, poi_idx);
        				
        			}
        			
@@ -240,7 +240,7 @@ function mark_poi_on_map(place) {
         
         var marker = new google.maps.Marker({
           map: map,
-          position: place.geometry.location
+          position: placeLoc
         });
         
          markersArray.push(marker);
